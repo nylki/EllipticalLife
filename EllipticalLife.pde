@@ -1,7 +1,4 @@
-import java.awt.Point;
-
-
-int steps = 150;
+int steps = 300;
 int maxChildParentDistance = 250;
 //int maxChilds = 2;
 LinkedList<Kreis> allCircles;
@@ -34,7 +31,7 @@ void setup() {
 //noch bedingungen für verkleinerung eines kreises später
 public class Kreis {
   int groupID;
-  float speed, radius;
+  float speed, durchmesser;
   color c;
 
   //ToDo: using PVector instead of single floats for better readability and performance (vector operations)
@@ -47,7 +44,7 @@ public class Kreis {
 
   void generateChildren(int amount) {
     for (int i=1;i<= amount;i++) {
-      Kreis neuerKreis = new Kreis(this.location.x + random(60), this.location.y + random(60), random(1, 3), (this.radius/1.5), this);
+      Kreis neuerKreis = new Kreis(this.location.x + random(60), this.location.y + random(60), random(1, 4), (this.durchmesser/1.5), this);
       this.childs.add(neuerKreis); 
       allCircles.add(neuerKreis);
     }
@@ -72,7 +69,7 @@ public class Kreis {
     this.speed = initialSpeed;
 
     this.direction = new PVector(random(width-50), random(height-50), 0);
-    this.radius = r;
+    this.durchmesser = r;
     this.parent = p;
     if (p == null)
       this.parent = this;
@@ -82,7 +79,7 @@ public class Kreis {
     //generate new color for itself and its children
     //and set a new groupID for identification
     if (parent == this) {
-      this.c = color(random(1000), random(300, 1000), random(700, 1000), 100);
+      this.c = color(random(1000), random(500, 1000), random(600, 1000), 100);
       groupsCount++;
       this.groupID = groupsCount;
     }
@@ -95,7 +92,7 @@ public class Kreis {
   }
 
   boolean collision(Kreis k1, Kreis k2) {
-    return (PVector.dist(k1.location, k2.location) < (k1.radius + k2.radius)/2);
+    return (PVector.dist(k1.location, k2.location) < (k1.durchmesser + k2.durchmesser)/2);
   }
 
 
@@ -107,25 +104,25 @@ public class Kreis {
 
 
     //if kreis is too small, remove it
-    if (this.radius < 4) 
+    if (this.durchmesser < 4) 
       removeKreis(this);
 
     //if kreis too big, let it explode into 3 colors (1 including the original
-    if (this.radius > (width + height)/6) {
+    if (this.durchmesser > (width + height)/7) {
       Kreis newK1 = new Kreis(this.location.x + random(60), this.location.y + random(60), 1, 30, this);
       Kreis newK2 = new Kreis(this.location.x + random(60), this.location.y + random(60), 1, 30, null);
       Kreis newK3 = new Kreis(this.location.x + random(60), this.location.y + random(60), 1, 30, null);
       allCircles.add(newK1); 
       allCircles.add(newK2); 
       allCircles.add(newK3); 
-      newK1.generateChildren(7); 
-      newK2.generateChildren(5); 
+      newK1.generateChildren(2); 
+      newK2.generateChildren(4); 
       newK3.generateChildren(5);
       removeKreis(this);
     }
 
-    //changing parents if radius changes
-    if (this.radius > this.parent.radius) {
+    //changing parents if durchmesser changes
+    if (this.durchmesser > this.parent.durchmesser) {
       //the parent of the parent
       for (int i=0; i<this.parent.childs.size(); i++) {
         Kreis child = this.parent.childs.get(i);
@@ -140,7 +137,7 @@ public class Kreis {
 
 
     if (random(1900) < 2) {
-      if (allCircles.size() < 200)
+      if (allCircles.size() < 300)
         generateChildren((int)random(1, 2.1));
     }
 
@@ -156,17 +153,17 @@ public class Kreis {
 
           k.direction.set(random(width), random(height), 0);
           this.direction.cross(k.direction );
-          Kreis smallerK = (k.radius < this.radius) ? k : this;
-          Kreis biggerK = (k.radius >= this.radius) ? k : this;
-          smallerK.radius = smallerK.radius - 0.4;
-          biggerK.radius = biggerK.radius + 0.3; 
+          Kreis smallerK = (k.durchmesser < this.durchmesser) ? k : this;
+          Kreis biggerK = (k.durchmesser >= this.durchmesser) ? k : this;
+          smallerK.durchmesser = smallerK.durchmesser - 0.1;
+          biggerK.durchmesser = biggerK.durchmesser + 0.1; 
 
           //chance to destroy the smaller one or assimilate the smaller one
           int r = (int)random(1, 1100);
           if (r < 1000 && !(smallerK.parent == smallerK && biggerK.parent == biggerK) ) {
 
             //add smaller circle to the bigger circles list and groupID etc
-            if (r > 880 ) {
+            if (r > 860 ) {
               smallerK.groupID = biggerK.groupID;
               smallerK.c = biggerK.c;
               smallerK.parent = biggerK;
@@ -182,19 +179,24 @@ public class Kreis {
                }*/
             }
             //else the bigger one eats the smaller one
-            else if (r > 810) {
-              biggerK.radius = biggerK.radius + smallerK.radius/3;
+            else if (r > 790) {
+              biggerK.durchmesser = biggerK.durchmesser + smallerK.durchmesser/3;
               removeKreis(smallerK);
               //sonst erstelle neuen kreis/neue gruppe
             } 
-            else if (r > 760 && allCircles.size() < 150) {
-              Kreis neuerKreis = new Kreis(biggerK.location.x + random(20), biggerK.location.y + random(20), 1, (smallerK.radius + biggerK.radius)/2, null);
+            else if (r > 760 && allCircles.size() < 150 && abs(k.durchmesser - this.durchmesser) < 30) {
+              Kreis neuerKreis = new Kreis(biggerK.location.x + random(20), biggerK.location.y + random(20), 1, (smallerK.durchmesser + biggerK.durchmesser)/2, null);
+              Kreis neuerKreis2 = new Kreis(biggerK.location.x + random(20), biggerK.location.y + random(20), 1, (smallerK.durchmesser + biggerK.durchmesser)/3, null);
               allCircles.add(neuerKreis);
               removeKreis(biggerK);
-              neuerKreis.generateChildren((int)random(0, 5));
+              neuerKreis.generateChildren((int)random(1, 3));
+              neuerKreis2.generateChildren((int)random(1, 3));
+            }
+            else if(r > 750){
+              removeKreis(k);
             }
           }
-          // continue;
+           continue;
         }
       }
     }
@@ -211,7 +213,7 @@ public class Kreis {
 
       this.direction.set(this.parent.location);
       this.direction.cross(this.location);
-      this.speed = 0.1;//  = this.parent + random(-20, 20);
+      this.speed = 0.2;//  = this.parent + random(-20, 20);
       //this.direction.y = 500;//this.direction.y + random(-20, 20);
       //this.direction.add(random(-20, 20),random(-20, 20),0);
     } 
@@ -244,17 +246,16 @@ public class Kreis {
     newLocationPart.div(steps);
     newLocationPart.mult(speed);
     this.location.add(newLocationPart);
+    //this.location.x += random(-0.7, 0.7) * noise( this.location.x,  this.location.y);
+    //this.location.y += random(-0.7, 0.7) * noise( this.location.x,  this.location.y);
+    
   }
 }
 
 void draw() {
   //System.out.println(allCircles.size());
-  background(200);
+  background(250);
   //lights();
-  //k1.x = mouseX;
-  //k1.y = mouseY;
-
-
 
   for (int i = 0; i < allCircles.size(); i++) {
     Kreis k = allCircles.get(i);
@@ -263,16 +264,16 @@ void draw() {
     fill(k.c);
     //fill(this.x,this.y,this.z);
 
-    ellipse(k.location.x, k.location.y, k.radius, k.radius);
+    ellipse(k.location.x, k.location.y, k.durchmesser, k.durchmesser);
     /*pushMatrix();
      translate(k.location.x, k.location.y, 0);
      
-     sphere(k.radius); 
+     sphere(k.durchmesser); 
      popMatrix();*/
   }
 
   if (mousePressed == true && kreisCreatedAfterMousePressed != null) {
-    kreisCreatedAfterMousePressed.radius = kreisCreatedAfterMousePressed.radius+1;
+    kreisCreatedAfterMousePressed.durchmesser = kreisCreatedAfterMousePressed.durchmesser+1;
     kreisCreatedAfterMousePressed.location.set((float)mouseX, (float)mouseY, 0);
   }
 }
