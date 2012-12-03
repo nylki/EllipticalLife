@@ -1,3 +1,35 @@
+
+/*
+AUTHOR:
+Tom Brewe
+
+LICENCE:
+GPL-3.0
+http://www.gnu.org/licenses/gpl-3.0
+
+Description:
+
+This program is an automation inspired by Cornway's Game of Life from 1970.
+Groups of colored circles will try to assimilate the other circles around,
+by 'eating' them, destryoing them, simply bouncing off, or creating new colors
+when colliding.
+It also featuresf child<->parent interaction and collision detection.
+If childs move too far away from their parents, they will be dragged by their
+parents into their direction.
+
+You can also add own balls for experimentation
+by simply clicking and holding the left mouse button.
+Your new circle-species will now try to conquer the other ones :)
+
+This is a Processing/Java program. compile and run with the processing IDE.
+Or download the built app from my github repository at:
+https://github.com/nylki
+
+
+
+
+
+*/
 int steps = 300;
 int maxCircles = 300;
 
