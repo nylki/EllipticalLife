@@ -1,6 +1,10 @@
 int steps = 300;
+int maxCircles = 300;
+
+//the distance to which children can move autonom.
+//if more far away than this var, parent drags children
 int maxChildParentDistance = 250;
-//int maxChilds = 2;
+
 LinkedList<Kreis> allCircles;
 Kreis k1, k2, kreisCreatedAfterMousePressed;
 int groupsCount=0;
@@ -14,9 +18,11 @@ void setup() {
   frameRate(50);
   noStroke();
   allCircles = new LinkedList();
+  float randomHue = random(0,1000);
   k1 = new Kreis(random(width), random(height), 1, 50, null);
   k2 = new Kreis(random(width), random(height), 1, 50, null);
-
+  k1.c = color(randomHue, random(500,1000), random(600,1000));
+  k1.c = color(1000 - randomHue, random(400,1000), random(600,1000)); //making sure, counterpart colors
   allCircles.add(k1);
   allCircles.add(k2);
 
@@ -136,8 +142,8 @@ public class Kreis {
     strokeWeight(0.4);
 
 
-    if (random(1900) < 2) {
-      if (allCircles.size() < 300)
+    if (random(1700) < 2) {
+      if (allCircles.size() < maxCircles)
         generateChildren((int)random(1, 2.1));
     }
 
@@ -155,8 +161,8 @@ public class Kreis {
           this.direction.cross(k.direction );
           Kreis smallerK = (k.durchmesser < this.durchmesser) ? k : this;
           Kreis biggerK = (k.durchmesser >= this.durchmesser) ? k : this;
-          smallerK.durchmesser = smallerK.durchmesser - 0.1;
-          biggerK.durchmesser = biggerK.durchmesser + 0.1; 
+          smallerK.durchmesser = smallerK.durchmesser - smallerK.durchmesser/60;
+          biggerK.durchmesser = biggerK.durchmesser + smallerK.durchmesser/60; 
 
           //chance to destroy the smaller one or assimilate the smaller one
           int r = (int)random(1, 1100);
@@ -180,7 +186,7 @@ public class Kreis {
             }
             //else the bigger one eats the smaller one
             else if (r > 790) {
-              biggerK.durchmesser = biggerK.durchmesser + smallerK.durchmesser/3;
+              biggerK.durchmesser = biggerK.durchmesser + smallerK.durchmesser/2.5;
               removeKreis(smallerK);
               //sonst erstelle neuen kreis/neue gruppe
             } 
@@ -196,7 +202,7 @@ public class Kreis {
               removeKreis(k);
             }
           }
-           continue;
+           //continue;
         }
       }
     }
