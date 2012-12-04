@@ -30,15 +30,15 @@ https://github.com/nylki
 
 
 */
-int steps = 300;
+int steps = 200;
 int maxCircles = 300;
 
 //the distance to which children can move autonom.
 //if more far away than this var, parent drags children
-int maxChildParentDistance = 250;
+int maxChildParentDistance = 100;
 
 LinkedList<Kreis> allCircles;
-Kreis k1, k2, kreisCreatedAfterMousePressed;
+Kreis kreisCreatedAfterMousePressed;
 int groupsCount=0;
 
 
@@ -51,19 +51,14 @@ void setup() {
   noStroke();
   allCircles = new LinkedList();
   float randomHue = random(0,1000);
-  k1 = new Kreis(random(width), random(height), 1, 50, null);
-  k2 = new Kreis(random(width), random(height), 1, 50, null);
-  k1.c = color(randomHue, random(500,1000), random(600,1000));
-  k1.c = color(1000 - randomHue, random(400,1000), random(600,1000)); //making sure, counterpart colors
-  allCircles.add(k1);
-  allCircles.add(k2);
-
-
-  k1.direction.set(k2.location);
-  k1.generateChildren(4);
-
-  k2.direction.set(k1.location);
-  k2.generateChildren(4);
+  
+  Kreis startK;
+  for(int i=0;i<6;i++){
+    startK = new Kreis(random(width), random(height), 1, 25, null);
+    allCircles.add(startK);
+    //startK.generateChildren(4);
+    
+  }
 }
 
 //noch bedingungen für verkleinerung eines kreises später
@@ -174,7 +169,7 @@ public class Kreis {
     strokeWeight(0.4);
 
 
-    if (random(1700) < 2) {
+    if (random(300) < 2) {
       if (allCircles.size() < maxCircles)
         generateChildren((int)random(1, 2.1));
     }
