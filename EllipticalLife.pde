@@ -30,6 +30,8 @@ https://github.com/nylki
 
 
 */
+import java.util.LinkedList;
+
 int steps = 300;
 int maxCircles = 300;
 
